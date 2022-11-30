@@ -1,0 +1,30 @@
+name: Get BRVM shares
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    - cron: '0 7-23 * * 1-5'
+    
+jobs:
+  build:
+    name: get shares
+    runs-on: ubuntu-latest
+    steps:
+      - name: "📥 Checkout Repo"
+        uses: actions/checkout@master
+
+      - name: "📡 get Data"
+        id: csv-data
+        uses: dofbi/BRVM-shares-actions@v0.0.1
+      
+      - name: "🔡 Save data"
+        run: echo "${{steps.csv-data.outputs.csv}}" > data/shares/${{steps.csv-data.outputs.file}}.csv
+
+      - name: "Commit Push change"
+        uses: devops-infra/action-commit-push@master
+        with:
+          github_token: "${{ secrets.GITHUB_TOKEN }}"
+          commit_prefix: "[AUTO]"
+          commit_message: "update shares - ${{steps.csv-data.outputs.file}}"
