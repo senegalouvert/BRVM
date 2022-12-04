@@ -13,16 +13,27 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: "📥 Checkout Repo"
-        uses: actions/checkout@master
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 2
 
       - name: "📡 get Data"
         id: csv-data
         uses: dofbi/BRVM-shares-actions@v0.0.1
       
-      - name: "🔡 Save data"
+      - name: "💾 Save data"
         run: echo "${{steps.csv-data.outputs.csv}}" > data/shares/${{steps.csv-data.outputs.file}}.csv
 
-      - name: "Commit Push change"
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v34
+
+      - name: "〽️ Check change"
+        id: ifchange
+        run: echo "diff=$(diff -q ${{ steps.changed-files.outputs.all_changed_files }} data/shares/${{steps.csv-data.outputs.file}}.csv)" >> $GITHUB_OUTPUT
+
+      - name: "🪢 Commit Push change"
+        if:   contains(steps.ifchange.outputs.diff, 'differ')
         uses: devops-infra/action-commit-push@master
         with:
           github_token: "${{ secrets.GITHUB_TOKEN }}"
