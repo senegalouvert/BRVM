@@ -1,9 +1,5 @@
 name: Get BRVM shares
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
   schedule:
     - cron: '0 7-23 * * 1-5'
     
@@ -24,13 +20,9 @@ jobs:
       - name: "💾 Save data"
         run: echo "${{steps.csv-data.outputs.csv}}" > data/shares/${{steps.csv-data.outputs.file}}.csv
 
-      - name: Get changed files
-        id: changed-files
-        uses: tj-actions/changed-files@v34
-
       - name: "〽️ Check change"
         id: ifchange
-        run: echo "diff=$(diff -q ${{ steps.changed-files.outputs.all_changed_files }} data/shares/${{steps.csv-data.outputs.file}}.csv)" >> $GITHUB_OUTPUT
+        run: echo "diff=$(diff -q $(cat diff-share) data/shares/${{steps.csv-data.outputs.file}}.csv)" >> $GITHUB_OUTPUT
 
       - name: "🪢 Commit Push change"
         if:   contains(steps.ifchange.outputs.diff, 'differ')

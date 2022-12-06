@@ -1,0 +1,27 @@
+name: Download newsletters BRVM
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    - cron: '0 20-23 * * 1-5'
+    
+jobs:
+  build:
+    name: get shares
+    runs-on: ubuntu-latest
+    steps:
+      - name: "📥 Checkout Repo"
+        uses: actions/checkout@v3
+
+      - name: "📡 get Data"
+        id: csv-data
+        uses: dofbi/BRVM-download-pdf@v0.0.1
+      
+      - name: "🪢 Commit Push change"
+        uses: devops-infra/action-commit-push@master
+        with:
+          github_token: "${{ secrets.GITHUB_TOKEN }}"
+          commit_prefix: "[AUTO]"
+          commit_message: "news newsletters"
