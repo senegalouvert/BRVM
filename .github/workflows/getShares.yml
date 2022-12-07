@@ -1,5 +1,9 @@
 name: Get BRVM shares
 on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
   schedule:
     - cron: '0 7-23 * * 1-5'
     
@@ -23,6 +27,10 @@ jobs:
       - name: "〽️ Check change"
         id: ifchange
         run: echo "diff=$(diff -q $(cat diff-share) data/shares/${{steps.csv-data.outputs.file}}.csv)" >> $GITHUB_OUTPUT
+
+      - name: "🆕 update diff-share file"
+        if:   contains(steps.ifchange.outputs.diff, 'differ')
+        run: echo -n "data/shares/${{steps.csv-data.outputs.file}}.csv)" > diff-share
 
       - name: "🪢 Commit Push change"
         if:   contains(steps.ifchange.outputs.diff, 'differ')
