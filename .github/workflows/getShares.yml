@@ -1,9 +1,5 @@
 name: Get BRVM shares
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
   schedule:
     - cron: '0 7-23 * * 1-5'
     
